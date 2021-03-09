@@ -1,0 +1,60 @@
+:root{
+    --clr-pri: #226666;
+    --clr-sec: #2D882D;
+    --clr-ter: #2E4172;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Navbar Styling */
+nav ul{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    list-style: none;
+}
+nav .links{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    list-style: none;
+}
+li{
+    margin: 5px 15px;
+}
+li:hover{
+    cursor: pointer;
+}
+a:link{
+    text-decoration: none;
+}
+
+/* Seating Chart Layout */
+div.seatingContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+div.seatingChart{
+    display: flex;
+    flex-direction: column;
+}
+div.row{
+    display: flex;
+    flex-direction: row;
+}
+
+/* Individual Seat Styling */
+.selected{
+    background-color: var(--clr-pri);
+}
+.unselected{
+    background-color: white;
+}
