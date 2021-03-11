@@ -55,6 +55,13 @@ div.row{
 .selected{
     background-color: var(--clr-pri);
 }
-.unselected{
+.available{
     background-color: white;
+}
+.unavailable{
+    background-color: gray;
+}
+
+.reserved{
+    background-color: red
 }
