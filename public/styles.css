@@ -65,3 +65,26 @@ div.row{
 .reserved{
     background-color: red
 }
+/* Tooltip Styling for Individual Seats: */
+.tooltip{
+    visibility: hidden;
+}
+
+.ttContainer:hover .tooltip{
+    visibility: visible;
+    opacity: 1.0;
+    position: relative;
+    background-color: burlywood;
+    color: black;
+    top: -125px;
+    left: -15px;
+    width: 200px;
+    white-space: normal;
+    padding: 15px 5px;
+    text-align: center;
+    border-radius: 3px;
+}
+
+.ttContainer:hover {
+    background-color: var(--clr-sec);
+}

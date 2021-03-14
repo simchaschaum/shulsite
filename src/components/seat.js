@@ -12,12 +12,21 @@ class Seat extends React.Component{
 
     render(){
      
-        let availSel = this.props.selected ? "selected" : 
-            !this.props.available ? "unavailable" : 
-                !this.props.reserved ? "available" : "reserved";
+        const availSel = this.props.selected ? "selected ttContainer" : 
+            !this.props.available ? "unavailable ttContainer" : 
+                !this.props.reserved ? "available ttContainer" : "reserved ttContainer";
         
-        // let reserved = this.props.reserved ? this.props.name : "Available"
 
+        const ttUnavailable = `Row ${this.props.row}, Seat ${this.props.seat} 
+            Unavailable`;
+        const ttReserved = `Row ${this.props.row}, Seat ${this.props.seat} 
+            Reserved for ${this.props.name}`;
+        const ttAvailable = `Row ${this.props.row}, Seat ${this.props.seat} 
+            Available`;
+ 
+        const tooltip = !this.props.available ? ttUnavailable : 
+            this.props.reserved ? ttReserved : ttAvailable;
+    
         return(
             <div 
             style={{border: "1px solid black", height: "50px", width: "50px"}}
@@ -25,8 +34,10 @@ class Seat extends React.Component{
             className={availSel}
             >
                 <span>Seat</span>
-                {/* <img src="https://img.icons8.com/ultraviolet/40/000000/theatre-seat.png"/> */}
-                {/* {reserved} */}
+                {this.props.available ? <img src="https://img.icons8.com/ultraviolet/40/000000/theatre-seat.png"/> : null}
+                <div className="tooltip">
+                    {tooltip}
+                </div>
             </div>
         )
     }

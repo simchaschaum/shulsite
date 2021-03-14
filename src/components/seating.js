@@ -2,13 +2,14 @@ import React  from "react";
 // import {db, seats} from "../utils/firebase";
 // import {firebaseArrMaker} from "../utils/fbtools";
 import Seat from "./seat";
+import Modal from "./modal";
 
 class Seating extends React.Component{
     constructor(props){
         super(props);
         this.state={
             rows:[],     // the rows, made up of seats (based on the number of rows and seats in the state below)
-            rowsNum: 8,
+            rowsNum: 8,     
             seatsPerRowNum: 8,
             selectedSeats:[]
         }
@@ -45,55 +46,6 @@ class Seating extends React.Component{
         this.setState({rows: rows});
     }
 
-    selectSeat = (r,s) => {
-        let editedArr = this.state.rows;
-        // check if seat is selected=true in state.selectedseats.
-        //if true, mark false; if false, mark true --> variable
-        let sel = this.state.rows[r-1][s-1].selected ? false : true;
-        //put variable in new object and reconstrct the new object
-        let avail = this.state.rows[r-1][s-1].available;
-        let res = this.state.rows[r-1][s-1].reserved;
-        let name = this.state.rows[r-1][s-1].name;
-        let obj = {
-            r:r,
-            s:s,
-            selected:sel,
-            available: avail,
-            reserved: res,
-            name: name
-        }
-        // replace old object in array with new object
-        editedArr[r-1].splice(s-1,1,obj);
-        // replace the array with changed array in the state
-        this.setState({rows: editedArr});
-    }
-
-    toggleAvailable = (e) => {
-        e.preventDefault();
-        let avail = (e.target.value=== "true");
-        let res = this.state.rows[r-1][s-1].reserved;
-        let name = this.state.rows[r-1][s-1].name;
-        let editedArr = this.state.rows;
-    // loop through array of rows, then seats;
-    // if each seat's availability does not match 'avail' (the desired availabiilty status), create a new seat object, replace the current seat object
-        for(var r=0; r<editedArr.length; r++){
-            for(var s=0; s<editedArr[r].length; s++){
-                if(editedArr[r][s].selected && editedArr[r][s].available !== avail){
-                    let obj = {
-                        r:r+1,
-                        s:s+1,
-                        selected:false,
-                        available: avail,
-                        reserved: res,
-                        name: name
-                    }
-                    editedArr[r].splice(s,1,obj);
-                } 
-            }
-        }
-        this.setState({rows: editedArr});
-    }
-
     setRowsSeats = (e) => {
         e.preventDefault();
         let rows = parseInt(document.getElementById("rows").value);
@@ -101,6 +53,30 @@ class Seating extends React.Component{
         this.setState({rowsNum:rows, seatsPerRowNum: seats}, ()=>this.makeSeatChart());
     }
 
+    selectSeat = (r,s) => {
+        let editedArr = this.state.rows;
+        let sel = this.state.rows[r-1][s-1].selected ? false : true;
+        let avail = this.state.rows[r-1][s-1].available;
+        let res = this.state.rows[r-1][s-1].reserved;
+        let name = this.state.rows[r-1][s-1].name;
+        this.editSeat(r-1,s-1,sel,avail,res,name);
+        }
+
+    toggleAvailable = (e) => {
+        e.preventDefault();
+        let editedArr = this.state.rows;
+        let avail = (e.target.value=== "true");
+        for(var r=0; r<editedArr.length; r++){
+            for(var s=0; s<editedArr[r].length; s++){
+                if(editedArr[r][s].selected && editedArr[r][s].available !== avail){
+                    this.editSeat(r,s,editedArr[r+1][s+1].selected,avail,editedArr[r+1][s+1].reserved,editedArr[r+1][s+1].name)
+                } 
+            }
+        }
+        this.setState({rows: editedArr});
+    }
+
+ 
     toggleReservation = (e) => {
         e.preventDefault();
         let editedArr = this.state.rows;
@@ -109,25 +85,10 @@ class Seating extends React.Component{
             for(var s=0; s<editedArr[r].length; s++){
                 if(editedArr[r][s].selected && editedArr[r][s].available){
                     if(editedArr[r][s].reserved){
-                        obj = {
-                            r:r+1,
-                            s:s+1,
-                            selected:false,
-                            available: editedArr[r][s].available,
-                            reserved: false,
-                            name: ""
+                        this.editSeat(r,s,false,editedArr[r][s].available,"")
+                        } else {
+                        this.editSeat(r,s,false,editedArr[r][s].available,true,document.getElementById("name").value)
                         }
-                    } else {
-                        obj = {
-                            r:r+1,
-                            s:s+1,
-                            selected:false,
-                            available: editedArr[r][s].available,
-                            reserved: true,
-                            name: document.getElementById("name").value
-                        }
-                    }
-                    editedArr[r].splice(s,1,obj);
                 } 
             }
         }
@@ -136,24 +97,42 @@ class Seating extends React.Component{
         console.log(this.state.rows[0]);
     }
 
+    editSeat = (r,s,sel,avail,res,name) => {
+        let editedArr = this.state.rows;
+        let obj = {
+            r:r+1,
+            s:s+1,
+            selected:sel,
+            available: avail,
+            reserved: res,
+            name: name
+        }
+        editedArr[r].splice(s,1,obj);
+        this.setState({rows: editedArr});
+    }
+
     render(){
         // Mapping the rows and seats per row to create the chart.  Number or rows and seats per row is controlled by state.
         const row = this.state.rows.map((row,i) => (<div className="row" key={i+1}>{
-            row.map((seat,i) => (<div className="seat" key={i+1}>{
-                <Seat 
-                    row={seat.r}
-                    seat={seat.s}
-                    selected={seat.selected}
-                    available={seat.available}
-                    selectSeat={(r,s)=>this.selectSeat(r,s)}
-                    reserved={seat.reserved}
-                    name={seat.name}
-                    />
-                }</div>))
+            row.map((seat,i) => (<div className="seat" key={i+1}>
+                    <div className="toolTip">
+
+                    </div>
+                    <Seat 
+                        row={seat.r}
+                        seat={seat.s}
+                        selected={seat.selected}
+                        available={seat.available}
+                        selectSeat={(r,s)=>this.selectSeat(r,s)}
+                        reserved={seat.reserved}
+                        name={seat.name}
+                        />
+                </div>))
         }</div>));  
 
         return(
         <div className="seatingContainer">
+            <Modal />
             <h1>Seats</h1>
             <p>Rows: {this.state.rowsNum}; Seats Per Row: {this.state.seatsPerRowNum}</p>
             <div className="seatingChart">
@@ -168,9 +147,9 @@ class Seating extends React.Component{
             </div>
             <form className="inputBox">
                 <label for="rows">Rows:</label>
-                <input type="number" id="rows" name="rows" min="1" onChange={(e)=>this.inputRowsSeats(e)}></input>
+                <input type="number" id="rows" name="rows" min="1"></input>
                 <label for="seats">Seats:</label>
-                <input type="number" id="seats" name="seats" min="1" onChange={(e)=>this.inputRowsSeats(e)}></input>
+                <input type="number" id="seats" name="seats" min="1"></input>
                 <input type="submit" onClick={(e)=>this.setRowsSeats(e)}></input>
             </form>
         </div>
