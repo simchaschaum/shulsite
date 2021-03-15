@@ -11,7 +11,8 @@ class Seating extends React.Component{
             rows:[],     // the rows, made up of seats (based on the number of rows and seats in the state below)
             rowsNum: 8,     
             seatsPerRowNum: 8,
-            selectedSeats:[]
+            selectedSeats:[],
+            modalDisplay: false,
         }
     }
     
@@ -46,11 +47,17 @@ class Seating extends React.Component{
         this.setState({rows: rows});
     }
 
-    setRowsSeats = (e) => {
+    // Modal popup to reset numbers of rows and seats:
+    modalPopup = (e) => {
         e.preventDefault();
-        let rows = parseInt(document.getElementById("rows").value);
-        let seats = parseInt(document.getElementById("seats").value);
-        this.setState({rowsNum:rows, seatsPerRowNum: seats}, ()=>this.makeSeatChart());
+        this.setState({modalDisplay: true})
+    }
+    closeModal = () => {
+        this.setState({modalDisplay: false})
+    }
+    // Reset numbers of rows and seats, accessible from the modal: 
+    setRowsSeats = (rows, seats) => {
+        this.setState({rowsNum:rows, seatsPerRowNum: seats, modalDisplay: false}, ()=>this.makeSeatChart());
     }
 
     selectSeat = (r,s) => {
@@ -132,7 +139,11 @@ class Seating extends React.Component{
 
         return(
         <div className="seatingContainer">
-            <Modal />
+            <Modal 
+                resetChart={(rows,seats)=>this.setRowsSeats(rows,seats)}
+                modalDisplay={this.state.modalDisplay}
+                closeModal={this.closeModal}
+            />
             <h1>Seats</h1>
             <p>Rows: {this.state.rowsNum}; Seats Per Row: {this.state.seatsPerRowNum}</p>
             <div className="seatingChart">
@@ -144,14 +155,9 @@ class Seating extends React.Component{
                 <input type="text" name="name" id="name" placeholder="Enter Name for Reservation"></input>
                 <button name="toggleAvailable" value={true} onClick={(e)=>this.toggleAvailable(e)}>Make Available</button>
                 <button name="toggleAvailable" value={false} onClick={(e)=>this.toggleAvailable(e)}>Make Unavailable</button>
+                <button name="resetChart" onClick={(e)=>this.modalPopup(e)}>Reset Chart</button>
             </div>
-            <form className="inputBox">
-                <label for="rows">Rows:</label>
-                <input type="number" id="rows" name="rows" min="1"></input>
-                <label for="seats">Seats:</label>
-                <input type="number" id="seats" name="seats" min="1"></input>
-                <input type="submit" onClick={(e)=>this.setRowsSeats(e)}></input>
-            </form>
+           
         </div>
         )
     }
